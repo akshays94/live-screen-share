@@ -3,8 +3,11 @@ console.log('Welcome to live-screen-share ...')
 const app = require('express')()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
+const cors = require('cors')
 
 const PORT = 3000
+
+app.use(cors())
 
 io.on('connection', function (socket) {
 
@@ -18,8 +21,9 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('USER_DISCONNECTED', socket.id);
   })
 
-  socket.on('VIDEO_IS_LIVE', function(base64Image) {
-    socket.broadcast.emit('JOIN_LIVE', base64Image);
+  socket.on('VIDEO_IS_LIVE', function(payload) {
+    const { base64Image, videoNumber } = payload;
+    socket.broadcast.emit(`JOIN_LIVE-${videoNumber}`, base64Image);
   })
 })
 
